@@ -1,1 +1,1 @@
-from Ethiopia import *
+from Ethiopia import Et
