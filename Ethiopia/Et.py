@@ -1,6 +1,5 @@
 import subprocess
 
-from click._compat import raw_input
 from datetime import datetime
 
 try:
@@ -26,8 +25,8 @@ gpm = ee.ImageCollection("NASA/GPM_L3/IMERG_V06")
 lstTerra8 = ee.ImageCollection("MODIS/006/MOD11A2").filterDate('2001-06-26', today)
 brdfReflect = ee.ImageCollection("MODIS/006/MCD43A4")
 brdfQA = ee.ImageCollection("MODIS/006/MCD43A2")
-string1 = str(raw_input('Start date:'))
-string2 = str(raw_input('End date:'))
+string1 = str(input('Start date:'))
+string2 = str(input('End date:'))
 
 
 reqStartDate = ee.Date(string1)
