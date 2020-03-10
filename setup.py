@@ -7,7 +7,7 @@ setup(
     author='Ram',
     author_email='Ramcr@ou.edu',
     # Needed to actually package something
-    packages=['Sample'],
+    packages=['Ethiopia'],
     # Needed for dependencies
     install_requires=['ee'],
   #  install_requires=['wget'],
