@@ -309,9 +309,9 @@ def exportSummaries():
 
 def downloadsummary():
     link = exportSummaries()
-    wget.download(precipURL,string1+'to'+string2+'precipFlat.csv')
-    wget.download(lstURL, string1 + 'to' + string2 + 'lstFlat.csv')
-    wget.download(brdfURL, string1 + 'to' + string2 + 'brdfFlat.csv')
+    wget.download(link[0],string1+'to'+string2+'precipFlat.csv')
+    wget.download(link[0], string1 + 'to' + string2 + 'lstFlat.csv')
+    wget.download(link[0], string1 + 'to' + string2 + 'brdfFlat.csv')
 
 
 def ExportToDrive():
