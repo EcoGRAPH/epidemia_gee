@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     # Needed to silence warnings (and to be a worthwhile package)
-    name='Measurements',
+    name='Epidemia',
     url='',
     author='Ram',
     author_email='Ramcr@ou.edu',
