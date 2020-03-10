@@ -309,34 +309,34 @@ brdfWoreda = brdfSummary.map(sumZonalBrdf);
 #latten the results for export
 brdfFlat = brdfWoreda.flatten();
 
-def exportSummaries():
-    precipURL = precipFlat.getDownloadURL(**{'filename': 'precipFilename','selectors': ['wid', 'woreda', 'doy', 'year', 'totprec']})
-    lstURL = lstFlat.getDownloadURL(**{'filename': 'lstFilename','selectors': ['wid', 'woreda', 'doy', 'year', 'lst_day', 'lst_night', 'lst_mean']})
-    brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename','selectors': ['wid', 'woreda', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5','ndwi6']})
-    downloadlist = [precipURL,lstURL,brdfURL]
-    return downloadlist
+#def exportSummaries():
+precipURL = precipFlat.getDownloadURL(**{'filename': 'precipFilename','selectors': ['wid', 'woreda', 'doy', 'year', 'totprec']})
+lstURL = lstFlat.getDownloadURL(**{'filename': 'lstFilename','selectors': ['wid', 'woreda', 'doy', 'year', 'lst_day', 'lst_night', 'lst_mean']})
+brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename','selectors': ['wid', 'woreda', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5','ndwi6']})
+#    downloadlist = [precipURL,lstURL,brdfURL]
+#    return downloadlist
 
-def downloadsummary():
-    link = exportSummaries()
-    wget.download(link[0],string1+'to'+string2+'precipFlat.csv')
-    wget.download(link[1], string1 + 'to' + string2 + 'lstFlat.csv')
-    wget.download(link[2], string1 + 'to' + string2 + 'brdfFlat.csv')
+#def downloadsummary():
+#link = exportSummaries()
+wget.download(precipURL,string1+'to'+string2+'precipFlat.csv')
+wget.download(lstURL, string1 + 'to' + string2 + 'lstFlat.csv')
+wget.download(brdfURL, string1 + 'to' + string2 + 'brdfFlat.csv')
 
 
-def ExportToDrive():
-    props1 = {'driveFolder': 'your_drive', 'driveFileNamePrefix': 'precip'+string1 +'to'+ string2,
-              'selectors': ['wid', 'woreda', 'doy', 'year', 'totprec'], 'fileFormat': 'CSV'}
-    task1 = ee.batch.Export.table(precipFlat, 'taskname', props1)
-    props2 = {'driveFolder': 'your_drive', 'driveFileNamePrefix': 'lst'+string1 +'to'+ string2,
-              'selectors': ['wid', 'woreda', 'doy', 'year', 'lst_day', 'lst_night', "lst_mean"], 'fileFormat': 'CSV'}
-    task2 = ee.batch.Export.table(lstFlat, 'taskname', props2)
-    props3 = {'driveFolder': 'your_drive', 'driveFileNamePrefix':'brdf'+string1 +'to'+ string2,
-              'selectors': ['wid', 'woreda', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6'],
-              'fileFormat': 'CSV'}
-    task3 = ee.batch.Export.table(brdfFlat, 'taskname', props3)
-    task1.start()
-    task2.start()
-    task3.start()
+#def ExportToDrive():
+props1 = {'driveFolder': 'your_drive', 'driveFileNamePrefix': 'precip'+string1 +'to'+ string2,
+          'selectors': ['wid', 'woreda', 'doy', 'year', 'totprec'], 'fileFormat': 'CSV'}
+task1 = ee.batch.Export.table(precipFlat, 'taskname', props1)
+props2 = {'driveFolder': 'your_drive', 'driveFileNamePrefix': 'lst'+string1 +'to'+ string2,
+          'selectors': ['wid', 'woreda', 'doy', 'year', 'lst_day', 'lst_night', "lst_mean"], 'fileFormat': 'CSV'}
+task2 = ee.batch.Export.table(lstFlat, 'taskname', props2)
+props3 = {'driveFolder': 'your_drive', 'driveFileNamePrefix':'brdf'+string1 +'to'+ string2,
+          'selectors': ['wid', 'woreda', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6'],
+          'fileFormat': 'CSV'}
+task3 = ee.batch.Export.table(brdfFlat, 'taskname', props3)
+task1.start()
+task2.start()
+task3.start()
 
 
 #def main():
