@@ -10,10 +10,10 @@ setup(
     packages=['Sample'],
     # Needed for dependencies
     install_requires=['ee'],
-    install_requires=['wget'],
-    install_requires=['subprocess'],
-    install_requires=['click._compat'],
-    install_requires=['datetime'],
+  #  install_requires=['wget'],
+  #  install_requires=['subprocess'],
+  #  install_requires=['click._compat'],
+   # install_requires=['datetime'],
     # *strongly* suggested for sharing
     version='0.1',
     # The license can be anything you like
