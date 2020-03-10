@@ -1,13 +1,4 @@
-import subprocess
-
 from datetime import datetime
-
-try:
-    import geehydro
-except ImportError:
-    print('geehydro package not installed. Installing ...')
-    subprocess.check_call(["python", '-m', 'pip', 'install', 'geehydro'])
-
 import ee
 import wget
 
