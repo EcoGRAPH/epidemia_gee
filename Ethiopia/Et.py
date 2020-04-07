@@ -333,7 +333,7 @@ def ExportToDrive():
 
 #def main():
 #summary = exportSummaries()
-downloadsummary()
+#downloadsummary()
 
 #print('precipURL',link[0])
 #print('lstURL',link[1])
