@@ -9,7 +9,7 @@ setup(
     # Needed to actually package something
     packages=['Ethiopia'],
     # Needed for dependencies
-    install_requires=['ee','wget','datetime'],
+    install_requires=['wget','datetime'],
   #  install_requires=['wget'],
   #  install_requires=['subprocess'],
   #  install_requires=['click._compat'],
