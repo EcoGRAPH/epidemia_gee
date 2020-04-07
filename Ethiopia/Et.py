@@ -312,6 +312,7 @@ def downloadsummary():
     wget.download(link[0],string1+'to'+string2+'precipFlat.csv')
     wget.download(link[0], string1 + 'to' + string2 + 'lstFlat.csv')
     wget.download(link[0], string1 + 'to' + string2 + 'brdfFlat.csv')
+    print("Data downloaded to local drive")
 
 
 def ExportToDrive():
