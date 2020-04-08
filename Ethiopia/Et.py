@@ -15,7 +15,7 @@ except Exception as e:
     ee.Initialize()
 
     
-def all(s1,s2):
+def inputdata(s1,s2):
     today = ee.Date(datetime.now())
 
     woreda = ee.FeatureCollection("users/ramcharankankanala/Final")
