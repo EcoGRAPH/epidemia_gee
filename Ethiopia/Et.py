@@ -391,7 +391,7 @@ def all(s1, s2):
     #datatolocaldrive()
     datatolocal()
 
-all('2009-01-01','2010-01-01')
+#all('2009-01-01','2010-01-01')
 # def main():
 # summary = exportSummaries()
 #
