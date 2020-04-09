@@ -317,9 +317,9 @@ def all(s1, s2):
                                              'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                            'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']})
         downloadlist = [precipURL, lstURL, brdfURL]
-        # print('precipURL:',precipURL)
-        # print('lstURL:',lstURL)
-        # print('brdfURL:',brdfURL)
+        print('precipURL:',precipURL)
+        print('lstURL:',lstURL)
+        print('brdfURL:',brdfURL)
         return downloadlist
 
     def downloadsummary():
