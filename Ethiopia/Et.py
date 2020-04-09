@@ -120,7 +120,7 @@ def all(s1, s2):
 
     # Step 3a: Calculate LST variables
     # Filter Terra LST by altered LST start date
-    lstFiltered = lstTerra8.filterDate(lstStartDate, reqEndDate.advance(1, 'day')).filterBounds(woreda).select(
+    lstFiltered = lstTerra8.filterDate(lstStartDate, reqEndDate.advance(8, 'day')).filterBounds(woreda).select(
         'LST_Day_1km', 'QC_Day', 'LST_Night_1km', 'QC_Night');
 
     def filterLstQA(image):
