@@ -2,6 +2,8 @@ from datetime import datetime
 
 import wget
 import requests
+from urllib import request
+
 try:
     from StringIO import StringIO
 
@@ -15,8 +17,8 @@ except Exception as e:
     ee.Authenticate()
     ee.Initialize()
 
-    
-def all(s1,s2):
+
+def all(s1, s2):
     today = ee.Date(datetime.now())
 
     woreda = ee.FeatureCollection("users/ramcharankankanala/Final")
@@ -24,49 +26,48 @@ def all(s1,s2):
     lstTerra8 = ee.ImageCollection("MODIS/006/MOD11A2").filterDate('2001-06-26', today)
     brdfReflect = ee.ImageCollection("MODIS/006/MCD43A4")
     brdfQA = ee.ImageCollection("MODIS/006/MCD43A2")
-    #string1 = str(input('Start date:'))
-    #string2 = str(input('End date:'))
+    # string1 = str(input('Start date:'))
+    # string2 = str(input('End date:'))
     string1 = s1
     string2 = s2
 
-
     reqStartDate = ee.Date(string1)
     reqEndDate = ee.Date(string2)
-    #print(reqStartDate)
+    # print(reqStartDate)
 
     lstEarliestDate = lstTerra8.first().date();
-    #print(lstEarliestDate)
-    #Filter collection to dates from beginning to requested
+    # print(lstEarliestDate)
+    # Filter collection to dates from beginning to requested
     priorLstImgcol = lstTerra8.filterDate(lstEarliestDate, reqStartDate);
-    #Get the latest (max) date of this collection of earlier images
+    # Get the latest (max) date of this collection of earlier images
     lstPrevMax = priorLstImgcol.reduceColumns(ee.Reducer.max(), ["system:time_start"]);
-    lstStartDate =  ee.Date(lstPrevMax.get('max'));
-    #print('lstStartDate', lstStartDate);
+    lstStartDate = ee.Date(lstPrevMax.get('max'));
+    # print('lstStartDate', lstStartDate);
 
     gpmAllMax = gpm.reduceColumns(ee.Reducer.max(), ["system:time_start"]);
-    gpmAllEndDateTime =  ee.Date(gpmAllMax.get('max'));
+    gpmAllEndDateTime = ee.Date(gpmAllMax.get('max'));
 
     gpmAllEndDate = ee.Date.fromYMD(**{
         'year': gpmAllEndDateTime.get('year'),
         'month': gpmAllEndDateTime.get('month'),
         'day': gpmAllEndDateTime.get('day')
-      });
+    });
 
     precipStartDate = ee.Date(ee.Algorithms.If(gpmAllEndDate.millis().lt(reqStartDate.millis()),
-                                          #if data ends before requested start, take last data date
-                                          gpmAllEndDate,
-                                          #otherwise use requested date as normal
-                                          reqStartDate));
-    #print('precipStartDate', precipStartDate);
+                                               # if data ends before requested start, take last data date
+                                               gpmAllEndDate,
+                                               # otherwise use requested date as normal
+                                               reqStartDate));
+    # print('precipStartDate', precipStartDate);
 
     brdfAllMax = brdfReflect.reduceColumns(ee.Reducer.max(), ["system:time_start"]);
-    brdfAllEndDate =  ee.Date(brdfAllMax.get('max'));
+    brdfAllEndDate = ee.Date(brdfAllMax.get('max'));
     brdfStartDate = ee.Date(ee.Algorithms.If(brdfAllEndDate.millis().lt(reqStartDate.millis()),
-                                          #if data ends before requested start, take last data date
-                                          brdfAllEndDate,
-                                          #otherwise use requested date as normal
-                                          reqStartDate));
-    #print('brdfStartDate', brdfStartDate);
+                                             # if data ends before requested start, take last data date
+                                             brdfAllEndDate,
+                                             # otherwise use requested date as normal
+                                             reqStartDate));
+    # print('brdfStartDate', brdfStartDate);
 
     # Step 2: Precipitation
     # Step 2a: Precipitation filtering and dates
@@ -82,15 +83,12 @@ def all(s1,s2):
     precipDays = precipEndDate.difference(precipStartDate, 'day');
     precipDatesPrep = ee.List.sequence(0, precipDays, 1);
 
-
-
     precipDatesPrep.getInfo()
+
     def makePrecipDates(n):
         return precipStartDate.advance(n, 'day');
 
-
     precipDates = precipDatesPrep.map(makePrecipDates);
-
 
     # precipDates.getInfo()
     def calcDailyPrecip(curdate):
@@ -101,11 +99,9 @@ def all(s1,s2):
             0.5).rename('totprec');
         return totprec.set('doy', curdoy).set('year', curyear).set('system:time_start', curdate);
 
-
     dailyPrecipExtended = ee.ImageCollection.fromImages(precipDates.map(calcDailyPrecip));
     dailyPrecip = dailyPrecipExtended.filterDate(reqStartDate, precipEndDate.advance(1, 'day'));
     precipSummary = dailyPrecip.filterDate(reqStartDate, reqEndDate.advance(1, 'day'));
-
 
     def sumZonalPrecip(image):
         # To get the doy and year, we convert the metadata to grids and then summarize
@@ -117,7 +113,6 @@ def all(s1,s2):
             'scale': 1000});
         return output;
 
-
     # Map the zonal statistics function over the filtered precip data
     precipWoreda = precipSummary.map(sumZonalPrecip);
     # Flatten the results for export
@@ -127,7 +122,6 @@ def all(s1,s2):
     # Filter Terra LST by altered LST start date
     lstFiltered = lstTerra8.filterDate(lstStartDate, reqEndDate.advance(1, 'day')).filterBounds(woreda).select(
         'LST_Day_1km', 'QC_Day', 'LST_Night_1km', 'QC_Night');
-
 
     def filterLstQA(image):
         qaday = image.select(['QC_Day']);
@@ -140,9 +134,7 @@ def all(s1,s2):
         outmask = ee.Image([daymask, nightmask]);
         return outimage.updateMask(outmask);
 
-
     lstFilteredQA = lstFiltered.map(filterLstQA);
-
 
     def rescaleLst(image):
         lst_day = image.select('LST_Day_1km').multiply(0.02).subtract(273.15).rename('lst_day');
@@ -155,20 +147,16 @@ def all(s1,s2):
         ).rename('lst_mean');
         return image.addBands(lst_day).addBands(lst_night).addBands(lst_mean);
 
-
     lstVars = lstFilteredQA.map(rescaleLst);
     lstRange = lstVars.reduceColumns(ee.Reducer.max(), ["system:time_start"]);
     lstEndDate = ee.Date(lstRange.get('max')).advance(7, 'day');
     lstDays = lstEndDate.difference(lstStartDate, 'day');
     lstDatesPrep = ee.List.sequence(0, lstDays, 1);
 
-
     def makeLstDates(n):
         return lstStartDate.advance(n, 'day')
 
-
     lstDates = lstDatesPrep.map(makeLstDates)
-
 
     def calcDailyLst(curdate):
         curyear = ee.Date(curdate).get('year');
@@ -177,16 +165,15 @@ def all(s1,s2):
         basedate = ee.Date.fromYMD(curyear, 1, 1);
         moddate = basedate.advance(moddoy.subtract(1), 'day');
         lst_day = lstVars.select('lst_day').filterDate(moddate, moddate.advance(1, 'day')).first().rename('lst_day');
-        lst_night = lstVars.select('lst_night').filterDate(moddate, moddate.advance(1, 'day')).first().rename('lst_night');
+        lst_night = lstVars.select('lst_night').filterDate(moddate, moddate.advance(1, 'day')).first().rename(
+            'lst_night');
         lst_mean = lstVars.select('lst_mean').filterDate(moddate, moddate.advance(1, 'day')).first().rename('lst_mean');
         return lst_day.addBands(lst_night).addBands(lst_mean).set('doy', curdoy).set('year', curyear).set(
             'system:time_start', curdate);
 
-
     dailyLstExtended = ee.ImageCollection.fromImages(lstDates.map(calcDailyLst));
     dailyLst = dailyLstExtended.filterDate(reqStartDate, lstEndDate.advance(1, 'day'));
     lstSummary = dailyLst.filterDate(reqStartDate, reqEndDate.advance(1, 'day'));
-
 
     def sumZonalLst(image):
         # To get the doy and year, we convert the metadata to grids and then summarize
@@ -198,7 +185,6 @@ def all(s1,s2):
             'reducer': ee.Reducer.mean(),
             'scale': 1000});
         return output;
-
 
     # Map the zonal statistics function over the filtered lst data
     lstWoreda = lstSummary.map(sumZonalLst);
@@ -226,17 +212,16 @@ def all(s1,s2):
     # Apply the join
     brdfJoined = innerJoin.apply(brdfReflectVars, brdfReflectQA, idJoin);
 
-
     def addQABands(image):
         nbar = ee.Image(image.get('NBAR'));
         qa = ee.Image(image.get('QA')).select(['qa2']);
         water = ee.Image(image.get('QA')).select(['water']);
         return nbar.addBands([qa, water]);
 
-
     brdfMerged = ee.ImageCollection(brdfJoined.map(addQABands));
+
     def filterBrdf(image):
-        qaband = image.select(['qa2']); #Right now, only using QA info for the NIR band
+        qaband = image.select(['qa2']);  # Right now, only using QA info for the NIR band
         wband = image.select(['water']);
         qamask = qaband.lte(2) and wband.eq(1);
         nir_r = image.select('nir').multiply(0.0001).rename('nir_r');
@@ -244,35 +229,42 @@ def all(s1,s2):
         swir1_r = image.select('swir1').multiply(0.0001).rename('swir1_r');
         swir2_r = image.select('swir2').multiply(0.0001).rename('swir2_r');
         blue_r = image.select('blue').multiply(0.0001).rename('blue_r');
-        return image.addBands(nir_r).addBands(red_r).addBands(swir1_r).addBands(swir2_r).addBands(blue_r).updateMask(qamask);
+        return image.addBands(nir_r).addBands(red_r).addBands(swir1_r).addBands(swir2_r).addBands(blue_r).updateMask(
+            qamask);
+
     brdfFilteredVars = brdfMerged.map(filterBrdf);
+
     def calcBrdfIndices(image):
         curyear = ee.Date(image.get("system:time_start")).get('year');
         curdoy = ee.Date(image.get("system:time_start")).getRelative('day', 'year').add(1);
         ndvi = image.normalizedDifference(['nir_r', 'red_r']).rename('ndvi');
         savi = image.expression(
-          '1.5 * (nir - red) / (nir + red + 0.5)', {
-            'nir': image.select('nir_r'),
-            'red': image.select('red_r')
-          }
+            '1.5 * (nir - red) / (nir + red + 0.5)', {
+                'nir': image.select('nir_r'),
+                'red': image.select('red_r')
+            }
         ).rename('savi');
         evi = image.expression(
-          '2.5 * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)', {
-            'nir': image.select('nir_r'),
-            'red': image.select('red_r'),
-            'blue': image.select('blue_r')
-          }
+            '2.5 * (nir - red) / (nir + 6 * red - 7.5 * blue + 1)', {
+                'nir': image.select('nir_r'),
+                'red': image.select('red_r'),
+                'blue': image.select('blue_r')
+            }
         ).rename('evi');
         ndwi5 = image.normalizedDifference(['nir_r', 'swir1_r']).rename('ndwi5');
         ndwi6 = image.normalizedDifference(['nir_r', 'swir2_r']).rename('ndwi6');
-        return image.addBands(ndvi).addBands(savi).addBands(evi).addBands(ndwi5).addBands(ndwi6).set('doy', curdoy).set('year', curyear);
+        return image.addBands(ndvi).addBands(savi).addBands(evi).addBands(ndwi5).addBands(ndwi6).set('doy', curdoy).set(
+            'year', curyear);
+
     brdfFilteredVars = brdfFilteredVars.map(calcBrdfIndices);
     brdfRange = brdfFilteredVars.reduceColumns(ee.Reducer.max(), ["system:time_start"]);
     brdfEndDate = ee.Date(brdfRange.get('max'));
     brdfDays = brdfEndDate.difference(brdfStartDate, 'day');
     brdfDatesPrep = ee.List.sequence(0, brdfDays, 1);
+
     def makeBrdfDates(n):
         return brdfStartDate.advance(n, 'day');
+
     brdfDates = brdfDatesPrep.map(makeBrdfDates);
 
     def calcDailyBrdf(curdate):
@@ -281,107 +273,130 @@ def all(s1,s2):
         brdfTemp = brdfFilteredVars.filterDate(ee.Date(curdate), ee.Date(curdate).advance(1, 'day'));
         brdfSize = brdfTemp.size();
         outimg = ee.Image(ee.Algorithms.If(brdfSize.eq(0),
-                                                   ee.Image.constant(0).selfMask()
-                                                     .addBands(ee.Image.constant(0).selfMask())
-                                                     .addBands(ee.Image.constant(0).selfMask())
-                                                     .addBands(ee.Image.constant(0).selfMask())
-                                                     .addBands(ee.Image.constant(0).selfMask())
-                                                     .rename(['ndvi', 'evi', 'savi', 'ndwi5', 'ndwi6'])
-                                                     .set('doy', curdoy)
-                                                     .set('year', curyear)
-                                                     .set('system:time_start', curdate),
-                                                   brdfTemp.first()));
+                                           ee.Image.constant(0).selfMask()
+                                           .addBands(ee.Image.constant(0).selfMask())
+                                           .addBands(ee.Image.constant(0).selfMask())
+                                           .addBands(ee.Image.constant(0).selfMask())
+                                           .addBands(ee.Image.constant(0).selfMask())
+                                           .rename(['ndvi', 'evi', 'savi', 'ndwi5', 'ndwi6'])
+                                           .set('doy', curdoy)
+                                           .set('year', curyear)
+                                           .set('system:time_start', curdate),
+                                           brdfTemp.first()));
         return outimg;
 
     dailyBrdfExtended = ee.ImageCollection.fromImages(brdfDates.map(calcDailyBrdf));
     dailyBrdf = dailyBrdfExtended.filterDate(reqStartDate, brdfEndDate.advance(1, 'day'));
     brdfSummary = dailyBrdf.filterDate(reqStartDate, reqEndDate.advance(1, 'day'));
-    #Function to calculate zonal statistics for spectral indices by county
+
+    # Function to calculate zonal statistics for spectral indices by county
     def sumZonalBrdf(image):
-    #To get the doy and year, we convert the metadata to grids and then summarize
+        # To get the doy and year, we convert the metadata to grids and then summarize
         image2 = image.addBands([image.metadata('doy').int(), image.metadata('year').int()]);
-    #educe by regions to get zonal means for each county
-        output = image2.select(['doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6'], ['doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']).reduceRegions(**{
-                             'collection': woreda,
-                             'reducer': ee.Reducer.mean(),
-                             'scale': 1000});
+        # educe by regions to get zonal means for each county
+        output = image2.select(['doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6'],
+                               ['doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']).reduceRegions(**{
+            'collection': woreda,
+            'reducer': ee.Reducer.mean(),
+            'scale': 1000});
         return output;
-    #ap the zonal statistics function over the filtered spectral index data
+
+    # ap the zonal statistics function over the filtered spectral index data
     brdfWoreda = brdfSummary.map(sumZonalBrdf);
-    #latten the results for export
+    # latten the results for export
     brdfFlat = brdfWoreda.flatten();
 
     def exportSummaries():
-        precipURL = precipFlat.getDownloadURL(**{'filename': 'precipFilename','selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'totprec']})
-        lstURL = lstFlat.getDownloadURL(**{'filename': 'lstFilename','selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'lst_day', 'lst_night', 'lst_mean']})
-        brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename','selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5','ndwi6']})
-        downloadlist = [precipURL,lstURL,brdfURL]
-        #print('precipURL:',precipURL)
-        #print('lstURL:',lstURL)
-        #print('brdfURL:',brdfURL)
+        precipURL = precipFlat.getDownloadURL(**{'filename': 'precipFilename',
+                                                 'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
+                                                               'totprec']})
+        lstURL = lstFlat.getDownloadURL(**{'filename': 'lstFilename',
+                                           'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
+                                                         'lst_day', 'lst_night', 'lst_mean']})
+        brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename',
+                                             'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
+                                                           'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']})
+        downloadlist = [precipURL, lstURL, brdfURL]
+        # print('precipURL:',precipURL)
+        # print('lstURL:',lstURL)
+        # print('brdfURL:',brdfURL)
         return downloadlist
 
     def downloadsummary():
         link = exportSummaries()
-        wget.download(link[0],string1+'to'+string2+'precipFlat.csv')
+        wget.download(link[0], string1 + 'to' + string2 + 'precipFlat.csv')
         wget.download(link[1], string1 + 'to' + string2 + 'lstFlat.csv')
         wget.download(link[2], string1 + 'to' + string2 + 'brdfFlat.csv')
         print("Data downloaded to local drive")
-        
+
     def datatolocaldrive():
         link = exportSummaries()
         url1 = link[0]
         url2 = link[1]
         url3 = link[2]
-        print('precipURL:',url1)
-        print('lstURL:',url2)
-        print('brdfURL:',url3)
-        r = requests.get(url1,timeout=1800)
+        print('precipURL:', url1)
+        print('lstURL:', url2)
+        print('brdfURL:', url3)
+        r = requests.get(url1, timeout=1800)
 
-        with open(string1+'to'+string2+'precipFlat.csv', 'wb') as f:
+        with open(string1 + 'to' + string2 + 'precipFlat.csv', 'wb') as f:
             f.write(r.content)
-            
-        r1 = requests.get(url2,timeout=1800)
+
+        r1 = requests.get(url2, timeout=1800)
 
         with open(string1 + 'to' + string2 + 'lstFlat.csv', 'wb') as f1:
             f1.write(r1.content)
-        
-        r2 = requests.get(url3,timeout=1800)
+
+        r2 = requests.get(url3, timeout=1800)
 
         with open(string1 + 'to' + string2 + 'brdfFlat.csv', 'wb') as f2:
             f2.write(r2.content)
-        
-        
-        
-        
+
+    def datatolocal():
+        link = exportSummaries()
+        url1 = link[0]
+        url2 = link[1]
+        url3 = link[2]
+        print('precipURL:', url1)
+        print('lstURL:', url2)
+        print('brdfURL:', url3)
+        request.urlretrieve(url1, string1 + 'to' + string2 + 'precipFlat.csv')
+        request.urlretrieve(url2, string1 + 'to' + string2 + 'lstFlat.csv')
+        request.urlretrieve(url3, string1 + 'to' + string2 + 'brdfFlat.csv')
+
 
 
     def ExportToDrive():
-        props1 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'precip'+string1 +'to'+ string2,
-                  'selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'totprec'], 'fileFormat': 'CSV'}
+        props1 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'precip' + string1 + 'to' + string2,
+                  'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year', 'totprec'],
+                  'fileFormat': 'CSV'}
         task1 = ee.batch.Export.table(precipFlat, 'taskname', props1)
-        props2 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'lst'+string1 +'to'+ string2,
-                  'selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'lst_day', 'lst_night', "lst_mean"], 'fileFormat': 'CSV'}
+        props2 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'lst' + string1 + 'to' + string2,
+                  'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year', 'lst_day', 'lst_night',
+                                "lst_mean"], 'fileFormat': 'CSV'}
         task2 = ee.batch.Export.table(lstFlat, 'taskname', props2)
-        props3 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix':'brdf'+string1 +'to'+ string2,
-                  'selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6'],
+        props3 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'brdf' + string1 + 'to' + string2,
+                  'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5',
+                                'ndwi6'],
                   'fileFormat': 'CSV'}
         task3 = ee.batch.Export.table(brdfFlat, 'taskname', props3)
         task1.start()
         task2.start()
         task3.start()
         print("Data Exported to google drive in to Ethiopiadata folder")
-        
-    #downloadsummary()
-    #ExportToDrive()
-    #exportSummaries()
-    datatolocaldrive()
 
+    # downloadsummary()
+    # ExportToDrive()
+    # exportSummaries()
+    #datatolocaldrive()
+    datatolocal()
 
-#def main():
-#summary = exportSummaries()
+all('2009-01-01','2010-01-01')
+# def main():
+# summary = exportSummaries()
 #
 
-#print('precipURL',link[0])
-#print('lstURL',link[1])
-#print('brdfURL',link[2])
+
+# print('precipURL',link[0])
+# print('lstURL',link[1])
+# print('brdfURL',link[2])
