@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import wget
+import requests
 try:
     from StringIO import StringIO
 
@@ -15,7 +16,7 @@ except Exception as e:
     ee.Initialize()
 
     
-def inputdata(s1,s2):
+def all(s1,s2):
     today = ee.Date(datetime.now())
 
     woreda = ee.FeatureCollection("users/ramcharankankanala/Final")
@@ -315,14 +316,44 @@ def inputdata(s1,s2):
         lstURL = lstFlat.getDownloadURL(**{'filename': 'lstFilename','selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'lst_day', 'lst_night', 'lst_mean']})
         brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename','selectors': ['NewPCODE', 'R_NAME','W_NAME','Z_NAME', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5','ndwi6']})
         downloadlist = [precipURL,lstURL,brdfURL]
+        #print('precipURL:',precipURL)
+        #print('lstURL:',lstURL)
+        #print('brdfURL:',brdfURL)
         return downloadlist
 
     def downloadsummary():
         link = exportSummaries()
         wget.download(link[0],string1+'to'+string2+'precipFlat.csv')
-        wget.download(link[0], string1 + 'to' + string2 + 'lstFlat.csv')
-        wget.download(link[0], string1 + 'to' + string2 + 'brdfFlat.csv')
+        wget.download(link[1], string1 + 'to' + string2 + 'lstFlat.csv')
+        wget.download(link[2], string1 + 'to' + string2 + 'brdfFlat.csv')
         print("Data downloaded to local drive")
+        
+    def datatolocaldrive():
+        link = exportSummaries()
+        url1 = link[0]
+        url2 = link[1]
+        url3 = link[2]
+        print('precipURL:',url1)
+        print('lstURL:',url2)
+        print('brdfURL:',url3)
+        r = requests.get(url1,timeout=1800)
+
+        with open(string1+'to'+string2+'precipFlat.csv', 'wb') as f:
+            f.write(r.content)
+            
+        r1 = requests.get(url2,timeout=1800)
+
+        with open(string1 + 'to' + string2 + 'lstFlat.csv', 'wb') as f1:
+            f1.write(r1.content)
+        
+        r2 = requests.get(url3,timeout=1800)
+
+        with open(string1 + 'to' + string2 + 'brdfFlat.csv', 'wb') as f2:
+            f2.write(r2.content)
+        
+        
+        
+        
 
 
     def ExportToDrive():
@@ -341,7 +372,16 @@ def inputdata(s1,s2):
         task3.start()
         print("Data Exported to google drive in to Ethiopiadata folder")
         
-    downloadsummary()
-    ExportToDrive()
+    #downloadsummary()
+    #ExportToDrive()
+    #exportSummaries()
+    datatolocaldrive()
 
 
+#def main():
+#summary = exportSummaries()
+#
+
+#print('precipURL',link[0])
+#print('lstURL',link[1])
+#print('brdfURL',link[2])
