@@ -316,10 +316,10 @@ def all(s1, s2):
         brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename',
                                              'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                            'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']})
-        downloadlist = precipURL
-        print('precipURL:',precipURL)
-        print('lstURL:',lstURL)
-        print('brdfURL:',brdfURL)
+        downloadlist = [precipURL,lstURL,brdfURL]
+       # print('precipURL:',precipURL)
+        #print('lstURL:',lstURL)
+        #print('brdfURL:',brdfURL)
         return downloadlist
 
     def downloadsummary():
@@ -343,17 +343,17 @@ def all(s1, s2):
         print('precipURL:', url1)
         print('lstURL:', url2)
         print('brdfURL:', url3)
-        r = requests.get(url1, timeout=1800)
+        r = requests.get(url1,allow_redirects=True)
 
         with open(string1 + 'to' + string2 + 'precipFlat.csv', 'wb') as f:
             f.write(r.content)
 
-        r1 = requests.get(url2, timeout=1800)
+        r1 = requests.get(url2,allow_redirects=True)
 
         with open(string1 + 'to' + string2 + 'lstFlat.csv', 'wb') as f1:
             f1.write(r1.content)
 
-        r2 = requests.get(url3, timeout=1800)
+        r2 = requests.get(url3,allow_redirects=True)
 
         with open(string1 + 'to' + string2 + 'brdfFlat.csv', 'wb') as f2:
             f2.write(r2.content)
@@ -393,8 +393,8 @@ def all(s1, s2):
 
     #downloadsummary()
     # ExportToDrive()
-    exportSummaries()
-    #datatolocaldrive()
+    #exportSummaries()
+    datatolocaldrive()
     #datatolocal()
 
 #all('2009-01-01','2010-01-01')
