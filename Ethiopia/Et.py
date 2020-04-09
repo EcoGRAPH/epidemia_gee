@@ -391,9 +391,9 @@ def all(s1, s2):
         task3.start()
         print("Data Exported to google drive in to Ethiopiadata folder")
 
-    downloadsummary()
+    #downloadsummary()
     # ExportToDrive()
-    # exportSummaries()
+    exportSummaries()
     #datatolocaldrive()
     #datatolocal()
 
