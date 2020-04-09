@@ -324,6 +324,12 @@ def all(s1, s2):
 
     def downloadsummary():
         link = exportSummaries()
+        url1 = link[0]
+        url2 = link[1]
+        url3 = link[2]
+        print('precipURL:', url1)
+        print('lstURL:', url2)
+        print('brdfURL:', url3)
         wget.download(link[0], string1 + 'to' + string2 + 'precipFlat.csv')
         wget.download(link[1], string1 + 'to' + string2 + 'lstFlat.csv')
         wget.download(link[2], string1 + 'to' + string2 + 'brdfFlat.csv')
@@ -385,11 +391,11 @@ def all(s1, s2):
         task3.start()
         print("Data Exported to google drive in to Ethiopiadata folder")
 
-    # downloadsummary()
+    downloadsummary()
     # ExportToDrive()
     # exportSummaries()
     #datatolocaldrive()
-    datatolocal()
+    #datatolocal()
 
 #all('2009-01-01','2010-01-01')
 # def main():
