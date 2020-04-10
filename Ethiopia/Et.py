@@ -307,19 +307,19 @@ def all(s1, s2):
     brdfFlat = brdfWoreda.flatten();
 
     def exportSummaries():
-        precipURL = precipFlat.getDownloadURL(**{'filename': 'precipFilename',
+        precipURL = precipFlat.getDownloadURL(**{'filename': 'string1 + 'to' + string2 + 'precipFlat.csv',
                                                  'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                                'totprec']})
-        lstURL = lstFlat.getDownloadURL(**{'filename': 'lstFilename',
+        lstURL = lstFlat.getDownloadURL(**{'filename': 'string1 + 'to' + string2 + 'lstFlat.csv',
                                            'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                          'lst_day', 'lst_night', 'lst_mean']})
-        brdfURL = brdfFlat.getDownloadURL(**{'filename': 'brdfFilename',
+        brdfURL = brdfFlat.getDownloadURL(**{'filename': 'string1 + 'to' + string2 + 'brdfFlat.csv',
                                              'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                            'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']})
         downloadlist = [precipURL,lstURL,brdfURL]
-       # print('precipURL:',precipURL)
-        #print('lstURL:',lstURL)
-        #print('brdfURL:',brdfURL)
+        print('precipURL:',precipURL)
+        print('lstURL:',lstURL)
+        print('brdfURL:',brdfURL)
         return downloadlist
 
     def downloadsummary():
@@ -393,8 +393,8 @@ def all(s1, s2):
 
     #downloadsummary()
     # ExportToDrive()
-    #exportSummaries()
-    datatolocaldrive()
+    exportSummaries()
+    #datatolocaldrive()
     #datatolocal()
 
 #all('2009-01-01','2010-01-01')
