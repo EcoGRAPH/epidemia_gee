@@ -376,16 +376,16 @@ def all(s1, s2):
         props1 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'precip' + string1 + 'to' + string2,
                   'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year', 'totprec'],
                   'fileFormat': 'CSV'}
-        task1 = ee.batch.Export.table(precipFlat, 'taskname', props1)
+        task1 = ee.batch.Export.table(precipFlat, 'Export_precip' + string1 + 'to' + string2, props1)
         props2 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'lst' + string1 + 'to' + string2,
                   'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year', 'lst_day', 'lst_night',
                                 "lst_mean"], 'fileFormat': 'CSV'}
-        task2 = ee.batch.Export.table(lstFlat, 'taskname', props2)
+        task2 = ee.batch.Export.table(lstFlat, 'Export_lst' + string1 + 'to' + string2, props2)
         props3 = {'driveFolder': 'Ethiopiadata', 'driveFileNamePrefix': 'brdf' + string1 + 'to' + string2,
                   'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year', 'ndvi', 'savi', 'evi', 'ndwi5',
                                 'ndwi6'],
                   'fileFormat': 'CSV'}
-        task3 = ee.batch.Export.table(brdfFlat, 'taskname', props3)
+        task3 = ee.batch.Export.table(brdfFlat, 'Export_brdf' + string1 + 'to' + string2, props3)
         task1.start()
         task2.start()
         task3.start()
