@@ -307,13 +307,13 @@ def all(s1, s2):
     brdfFlat = brdfWoreda.flatten();
 
     def exportSummaries():
-        precipURL = precipFlat.getDownloadURL(**{'filename': 'string1 + 'to' + string2 + 'precipFlat.csv',
+        precipURL = precipFlat.getDownloadURL(**{'filename': string1 + ' ' + 'to'+ ' ' + string2 + 'precipFlat.csv',
                                                  'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                                'totprec']})
-        lstURL = lstFlat.getDownloadURL(**{'filename': 'string1 + 'to' + string2 + 'lstFlat.csv',
+        lstURL = lstFlat.getDownloadURL(**{'filename': string1 + ' ' + 'to' + ' ' + string2 + 'lstFlat.csv',
                                            'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                          'lst_day', 'lst_night', 'lst_mean']})
-        brdfURL = brdfFlat.getDownloadURL(**{'filename': 'string1 + 'to' + string2 + 'brdfFlat.csv',
+        brdfURL = brdfFlat.getDownloadURL(**{'filename': string1 + ' ' + 'to' + ' ' + string2 + 'brdfFlat.csv',
                                              'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
                                                            'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']})
         downloadlist = [precipURL,lstURL,brdfURL]
