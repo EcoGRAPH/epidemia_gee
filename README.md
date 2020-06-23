@@ -10,3 +10,4 @@
 4) Run functions and check downloaded data in your Google-Drive.
 
 #### For detailed installation and run steps refer to "Installation_Steps" document.
+#### For an example use of this package, please see the EPIDEMIA_GEE_python.R script in the GEE folder of the EPIDEMIA demo project:  https://github.com/EcoGRAPH/epidemiar-demo.
