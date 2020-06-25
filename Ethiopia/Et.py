@@ -305,23 +305,6 @@ def gee_to_drive(s1, s2):
     brdfWoreda = brdfSummary.map(sumZonalBrdf);
     # latten the results for export
     brdfFlat = brdfWoreda.flatten();
-
-    def exportSummaries():
-        precipURL = precipFlat.getDownloadURL(**{'filename': string1 + ' ' + 'to'+ ' ' + string2 + 'precipFlat.csv',
-                                                 'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
-                                                               'totprec']})
-        lstURL = lstFlat.getDownloadURL(**{'filename': string1 + ' ' + 'to' + ' ' + string2 + 'lstFlat.csv',
-                                           'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
-                                                         'lst_day', 'lst_night', 'lst_mean']})
-        brdfURL = brdfFlat.getDownloadURL(**{'filename': string1 + ' ' + 'to' + ' ' + string2 + 'brdfFlat.csv',
-                                             'selectors': ['NewPCODE', 'R_NAME', 'W_NAME', 'Z_NAME', 'doy', 'year',
-                                                           'ndvi', 'savi', 'evi', 'ndwi5', 'ndwi6']})
-        downloadlist = [precipURL,lstURL,brdfURL]
-        print('precipURL:',precipURL)
-        print('lstURL:',lstURL)
-        print('brdfURL:',brdfURL)
-        return downloadlist
-
     def downloadsummary():
         link = exportSummaries()
         url1 = link[0]
@@ -394,16 +377,4 @@ def gee_to_drive(s1, s2):
 
     #downloadsummary()
     ExportToDrive()
-    exportSummaries()
     #datatolocaldrive()
-    #datatolocal()
-
-#all('2009-01-01','2010-01-01')
-# def main():
-# summary = exportSummaries()
-#
-
-
-# print('precipURL',link[0])
-# print('lstURL',link[1])
-# print('brdfURL',link[2])
